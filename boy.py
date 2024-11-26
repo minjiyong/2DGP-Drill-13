@@ -185,6 +185,7 @@ class Boy:
     def __init__(self):
         self.frame = 0
         self.action = 3
+        self.ball_count = 0
         self.image = load_image('animation_sheet.png')
         self.font = load_font('ENCR10B.TTF', 24)
         self.state_machine = StateMachine(self)
@@ -218,25 +219,28 @@ class Boy:
         self.y += math.sin(self.dir) * self.speed * game_framework.frame_time
 
         # 월드 기준으로 x, y 위치를 제한할 필요
-        #self.x = clamp(25.0, self.x, server.background.w - 25.0)
-        #self.y = clamp(30.0, self.y, server.background.h - 30.0)
+        self.x = clamp(25.0, self.x, server.background.w - 25.0)
+        self.y = clamp(30.0, self.y, server.background.h - 30.0)
 
     def handle_event(self, event):
         self.state_machine.handle_event(('INPUT', event))
 
     def draw(self):
-        #sx = self.x - server.background.window_left
-        #sy = self.y - server.background.window_bottom
-        sx, sy = get_canvas_width() // 2, get_canvas_height() // 2
+        sx = self.x - server.background.window_left
+        sy = self.y - server.background.window_bottom
+        #sx, sy = get_canvas_width() // 2, get_canvas_height() // 2
 
         self.image.clip_draw(int(self.frame) * 100, self.action * 100, 100, 100, sx, sy)
         self.font.draw(int(sx - 100), int(sy + 60), f'({self.x:5.5}, {self.y:5.5})', (255, 255, 0))
+        self.font.draw(int(sx - 100), int(sy + 90), f'(ball: {self.ball_count})', (255, 0, 0))
 
 
     def get_bb(self):
         return self.x - 20, self.y - 50, self.x + 20, self.y + 50
 
     def handle_collision(self, group, other):
+        if group == 'boy:ball':
+            self.ball_count += 1
         pass
 
 
